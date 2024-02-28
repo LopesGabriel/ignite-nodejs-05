@@ -4,8 +4,9 @@ import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { fakerPT_BR as fakerPtBr } from '@faker-js/faker'
 import { PrismaService } from '@/prisma/prisma.service'
+import { hash } from 'bcryptjs'
 
-describe('Create account (E2E)', () => {
+describe('Authenticate (E2E)', () => {
   let app: INestApplication
   let prisma: PrismaService
 
@@ -21,7 +22,7 @@ describe('Create account (E2E)', () => {
     await app.init()
   })
 
-  test('[POST] /accounts', async () => {
+  test('[POST] /sessions', async () => {
     const name = fakerPtBr.person.fullName()
     const email = fakerPtBr.internet.email({
       firstName: name.split(' ')[0],
@@ -29,23 +30,22 @@ describe('Create account (E2E)', () => {
     })
     const password = fakerPtBr.internet.password()
 
-    const response = await request(app.getHttpServer())
-      .post('/accounts')
-      .send({ name, email, password })
-
-    expect(response.statusCode).toBe(201)
-
-    const userOnDatabase = await prisma.user.findUnique({
-      where: { email },
-    })
-
-    expect(userOnDatabase).toEqual(
-      expect.objectContaining({
-        id: expect.any(String),
+    await prisma.user.create({
+      data: {
         name,
         email,
-        password: expect.not.stringMatching(password),
-      }),
-    )
+        password: await hash(password, 8),
+      },
+    })
+
+    const response = await request(app.getHttpServer())
+      .post('/sessions')
+      .send({ email, password })
+
+    expect(response.statusCode).toBe(200)
+
+    expect(response.body).toEqual({
+      access_token: expect.any(String),
+    })
   })
 })
