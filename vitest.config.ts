@@ -5,7 +5,14 @@ import tsConfigPaths from 'vite-tsconfig-paths'
 export default defineConfig({
   test: {
     globals: true,
-    root: './src',
+    exclude: [
+      './data/**',
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/cypress/**',
+      '**/.{idea,git,cache,output,temp}/**',
+      '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build,eslint,prettier}.config.*',
+    ],
   },
   plugins: [
     tsConfigPaths(),
