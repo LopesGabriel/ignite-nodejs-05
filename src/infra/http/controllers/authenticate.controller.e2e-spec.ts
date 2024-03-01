@@ -3,7 +3,7 @@ import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { fakerPT_BR as fakerPtBr } from '@faker-js/faker'
-import { PrismaService } from '@/infra/prisma/prisma.service'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { hash } from 'bcryptjs'
 
 describe('Authenticate (E2E)', () => {
