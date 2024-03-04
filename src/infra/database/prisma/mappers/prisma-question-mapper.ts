@@ -23,9 +23,11 @@ export class PrismaQuestionMapper {
 
   static toPrisma(question: Question): Prisma.QuestionUncheckedCreateInput {
     return {
-      id: question.id.toString(),
+      id: question.id ? question.id.toString() : undefined,
       authorId: question.authorId.toString(),
-      bestAnswerId: question.bestAnswerId.toString(),
+      bestAnswerId: question.bestAnswerId
+        ? question.bestAnswerId.toString()
+        : undefined,
       title: question.title,
       content: question.content,
       slug: question.slug.value,
