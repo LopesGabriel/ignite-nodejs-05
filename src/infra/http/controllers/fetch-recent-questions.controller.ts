@@ -1,4 +1,10 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common'
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Query,
+  UseGuards,
+} from '@nestjs/common'
 import { AuthGuard } from '@nestjs/passport'
 import { ZodValidationPipe } from '@/infra/http/pipes/zod-validation-pipe'
 import { z } from 'zod'
@@ -23,12 +29,14 @@ export class FetchRecentQuestionsController {
 
   @Get()
   async handle(@Query('page', queryValidationPipe) page: number) {
-    const {
-      value: { questions },
-    } = await this.fetchRecentQuestions.execute({
+    const result = await this.fetchRecentQuestions.execute({
       page,
     })
 
-    return { questions: questions.map(QuestionPresenter.toHTTP) }
+    if (result.isLeft()) {
+      throw new BadRequestException()
+    }
+
+    return { questions: result.value.questions.map(QuestionPresenter.toHTTP) }
   }
 }
