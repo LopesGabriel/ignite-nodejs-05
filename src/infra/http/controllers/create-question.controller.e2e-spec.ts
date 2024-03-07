@@ -3,45 +3,36 @@ import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { fakerPT_BR as fakerPtBr } from '@faker-js/faker'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
-import { hash } from 'bcryptjs'
 import { JwtService } from '@nestjs/jwt'
+import { StudentFactory } from 'test/factories/make-student'
+import { DatabaseModule } from '@/infra/database/database.module'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
 
 describe('Create question (E2E)', () => {
   let app: INestApplication
-  let prisma: PrismaService
   let jwt: JwtService
+  let studentFactory: StudentFactory
+  let prisma: PrismaService
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, DatabaseModule],
+      providers: [StudentFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
 
     prisma = moduleRef.get(PrismaService)
+    studentFactory = moduleRef.get(StudentFactory)
     jwt = moduleRef.get(JwtService)
 
     await app.init()
   })
 
   test('[POST] /questions', async () => {
-    const name = fakerPtBr.person.fullName()
-    const email = fakerPtBr.internet.email({
-      firstName: name.split(' ')[0],
-      lastName: name.split(' ')[1],
-    })
-    const password = fakerPtBr.internet.password()
+    const user = await studentFactory.makePrismaStudent()
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: await hash(password, 8),
-      },
-    })
-
-    const accessToken = jwt.sign({ sub: user.id })
+    const accessToken = jwt.sign({ sub: user.id.toString() })
 
     const title = fakerPtBr.lorem.sentence(5)
     const content = fakerPtBr.lorem.paragraphs()
@@ -62,7 +53,7 @@ describe('Create question (E2E)', () => {
         id: expect.any(String),
         title,
         content,
-        authorId: user.id,
+        authorId: user.id.toString(),
       }),
     )
   })

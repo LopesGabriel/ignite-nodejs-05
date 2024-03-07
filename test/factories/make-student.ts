@@ -5,6 +5,9 @@ import {
   Student,
   StudentProps,
 } from '@/domain/forum/enterprise/entities/student'
+import { Injectable } from '@nestjs/common'
+import { PrismaService } from '@/infra/database/prisma/prisma.service'
+import { PrismaStudentMapper } from '@/infra/database/prisma/mappers/prisma-student-mapper'
 
 export function makeStudent(
   override: Partial<StudentProps> = {},
@@ -26,4 +29,22 @@ export function makeStudent(
   )
 
   return student
+}
+
+@Injectable()
+export class StudentFactory {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async makePrismaStudent(
+    data: Partial<StudentProps> = {},
+    id?: UniqueEntityId,
+  ): Promise<Student> {
+    const student = makeStudent(data, id)
+
+    await this.prisma.user.create({
+      data: PrismaStudentMapper.toPrisma(student),
+    })
+
+    return student
+  }
 }

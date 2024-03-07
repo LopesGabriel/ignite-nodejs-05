@@ -10,7 +10,7 @@ export class QuestionPresenter {
       bestAnswerId: question.bestAnswerId?.toString(),
       author: question.authorId.toString(),
       createdAt: question.createdAt.toISOString(),
-      updatedAt: question.updatedAt.toISOString(),
+      updatedAt: question.updatedAt?.toISOString(),
     }
   }
 }

@@ -3,21 +3,23 @@ import { INestApplication } from '@nestjs/common'
 import { Test } from '@nestjs/testing'
 import request from 'supertest'
 import { fakerPT_BR as fakerPtBr } from '@faker-js/faker'
-import { PrismaService } from '@/infra/database/prisma/prisma.service'
 import { hash } from 'bcryptjs'
+import { StudentFactory } from 'test/factories/make-student'
+import { DatabaseModule } from '@/infra/database/database.module'
 
 describe('Authenticate (E2E)', () => {
   let app: INestApplication
-  let prisma: PrismaService
+  let studentFactory: StudentFactory
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
+      imports: [AppModule, DatabaseModule],
+      providers: [StudentFactory],
     }).compile()
 
     app = moduleRef.createNestApplication()
 
-    prisma = moduleRef.get(PrismaService)
+    studentFactory = moduleRef.get(StudentFactory)
 
     await app.init()
   })
@@ -30,12 +32,10 @@ describe('Authenticate (E2E)', () => {
     })
     const password = fakerPtBr.internet.password()
 
-    await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: await hash(password, 8),
-      },
+    await studentFactory.makePrismaStudent({
+      email,
+      name,
+      password: await hash(password, 8),
     })
 
     const response = await request(app.getHttpServer())
