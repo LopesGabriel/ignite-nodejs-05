@@ -40,3 +40,17 @@ Authorization: Bearer {{authToken}}
 GET {{baseUrl}}/questions
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
+
+###
+
+# @name upload_image
+POST {{baseUrl}}/attachments
+Authorization: Bearer {{authToken}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="sample-upload.jpg"
+Content-Type: image/jpeg
+
+< ./test/e2e/sample-upload.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW--

@@ -7,6 +7,7 @@ import { StudentFactory } from 'test/factories/make-student'
 import { DatabaseModule } from '@/infra/database/database.module'
 import { QuestionFactory } from 'test/factories/make-question'
 import { join } from 'path'
+import { StorageModule } from '@/infra/storage/storage.module'
 
 describe('Upload attachment (E2E)', () => {
   let app: INestApplication
@@ -15,7 +16,7 @@ describe('Upload attachment (E2E)', () => {
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
-      imports: [AppModule, DatabaseModule],
+      imports: [AppModule, DatabaseModule, StorageModule],
       providers: [StudentFactory, QuestionFactory],
     }).compile()
 
@@ -31,6 +32,7 @@ describe('Upload attachment (E2E)', () => {
     const user = await studentFactory.makePrismaStudent()
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
+    console.log(process.env)
 
     const filePath = join(__dirname, '../../../../test/e2e/sample-upload.jpg')
 
@@ -40,5 +42,8 @@ describe('Upload attachment (E2E)', () => {
       .attach('file', filePath)
 
     expect(response.statusCode).toBe(201)
-  })
+    expect(response.body).toEqual({
+      attachmentId: expect.any(String),
+    })
+  }, 10000)
 })
