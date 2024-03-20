@@ -32,7 +32,6 @@ describe('Upload attachment (E2E)', () => {
     const user = await studentFactory.makePrismaStudent()
 
     const accessToken = jwt.sign({ sub: user.id.toString() })
-    console.log(process.env)
 
     const filePath = join(__dirname, '../../../../test/e2e/sample-upload.jpg')
 
