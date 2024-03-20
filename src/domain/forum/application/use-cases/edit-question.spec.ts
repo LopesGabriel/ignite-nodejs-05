@@ -82,4 +82,37 @@ describe('Edit Question', () => {
     expect(result.value).toBeInstanceOf(NotAllowedError)
     expect(inMemoryQuestionsRepository.items).toHaveLength(1)
   })
+
+  it('should sync new and removed attachments when editing a question', async () => {
+    const question = makeQuestion({
+      authorId: new UniqueEntityId('author-1'),
+    })
+    await inMemoryQuestionsRepository.create(question)
+
+    inMemoryQuestionAttachmentsRepository.items.push(
+      makeQuestionAttachment({
+        questionId: question.id,
+        attachmentId: new UniqueEntityId('1'),
+      }),
+      makeQuestionAttachment({
+        questionId: question.id,
+        attachmentId: new UniqueEntityId('2'),
+      }),
+    )
+
+    const result = await sut.execute({
+      questionId: question.id.toValue(),
+      authorId: 'author-1',
+      content: 'This is the updated content',
+      title: 'Updated title',
+      attachmentsIds: ['1', '3'],
+    })
+
+    expect(result.isRight()).toBe(true)
+    expect(inMemoryQuestionAttachmentsRepository.items).toHaveLength(2)
+    expect(inMemoryQuestionAttachmentsRepository.items).toEqual([
+      expect.objectContaining({ attachmentId: new UniqueEntityId('1') }),
+      expect.objectContaining({ attachmentId: new UniqueEntityId('3') }),
+    ])
+  })
 })
