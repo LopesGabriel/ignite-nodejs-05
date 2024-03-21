@@ -11,8 +11,10 @@ import {
 import { InMemoryNotificationsRepository } from 'test/repositories/in-memory-notifications-repository'
 import { makeQuestion } from 'test/factories/make-question'
 import { SpyInstance } from 'vitest'
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository'
 
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
 let inMemoryNotificationsRepository: InMemoryNotificationsRepository
@@ -25,7 +27,11 @@ let sendNotificationExecuteSpy: SpyInstance<
 
 describe('On Answer Created', () => {
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
+    )
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository()
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository(

@@ -11,7 +11,9 @@ import { InMemoryNotificationsRepository } from 'test/repositories/in-memory-not
 import { makeQuestion } from 'test/factories/make-question'
 import { SpyInstance } from 'vitest'
 import { OnQuestionBestAnswerChosenCreated } from './on-question-best-answer-chosen'
+import { InMemoryAnswerAttachmentsRepository } from 'test/repositories/in-memory-answer-attachments-repository'
 
+let inMemoryAnswerAttachmentsRepository: InMemoryAnswerAttachmentsRepository
 let inMemoryQuestionAttachmentsRepository: InMemoryQuestionAttachmentsRepository
 let inMemoryAnswersRepository: InMemoryAnswersRepository
 let inMemoryQuestionsRepository: InMemoryQuestionsRepository
@@ -25,7 +27,11 @@ let sendNotificationExecuteSpy: SpyInstance<
 
 describe('On Question Best Answer', () => {
   beforeEach(() => {
-    inMemoryAnswersRepository = new InMemoryAnswersRepository()
+    inMemoryAnswerAttachmentsRepository =
+      new InMemoryAnswerAttachmentsRepository()
+    inMemoryAnswersRepository = new InMemoryAnswersRepository(
+      inMemoryAnswerAttachmentsRepository,
+    )
     inMemoryQuestionAttachmentsRepository =
       new InMemoryQuestionAttachmentsRepository()
     inMemoryQuestionsRepository = new InMemoryQuestionsRepository(

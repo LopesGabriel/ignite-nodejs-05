@@ -26,16 +26,21 @@ export function makeAnswerAttachment(
 export class AnswerAttachmentFactory {
   constructor(private readonly prisma: PrismaService) {}
 
-  // async makePrismaAnswerAttachment(
-  //   data: Partial<AnswerAttachmentProps> = {},
-  //   id?: UniqueEntityId,
-  // ): Promise<AnswerAttachment> {
-  //   const answerAttachment = makeAnswerAttachment(data, id)
+  async makePrismaAnswerAttachment(
+    data: Partial<AnswerAttachmentProps> = {},
+    id?: UniqueEntityId,
+  ): Promise<AnswerAttachment> {
+    const answerAttachment = makeAnswerAttachment(data, id)
 
-  //   await this.prisma.comment.create({
-  //     data: PrismaAnswerAttachmentMapper.toPrisma(answerAttachment),
-  //   })
+    await this.prisma.attachment.update({
+      where: {
+        id: answerAttachment.attachmentId.toString(),
+      },
+      data: {
+        answerId: answerAttachment.answerId.toString(),
+      },
+    })
 
-  //   return answerattachment
-  // }
+    return answerAttachment
+  }
 }
