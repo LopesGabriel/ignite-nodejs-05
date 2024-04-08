@@ -3,7 +3,7 @@ version: '3.8'
 services:
   postgres:
     container_name: nest-clean-pg
-    image: postgres
+    image: postgres:15.6-alpine3.19
     ports:
       - 5432:5432
     environment:
